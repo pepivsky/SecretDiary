@@ -31,3 +31,10 @@ google-services.json
 
 # Android Profiling
 *.hprof
+/settings.gradle
+local.properties
+settings.gradle
+gradle.properties
+gradle
+gradlew
+gradlew.bat
