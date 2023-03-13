@@ -17,9 +17,9 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 
+
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-
     //lateinit var adapter: RecyclerAdapter
     val notes = mutableListOf<Note>()
 
@@ -28,6 +28,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+
 
 
         binding.btnSave.setOnClickListener {
@@ -46,29 +49,27 @@ class MainActivity : AppCompatActivity() {
             val date = localDateTime.format(formatter)
 
             val text = binding.etNewWriting.text.toString()
-            val oldText = binding.tvDiary.text.trim()
+            //val oldText = binding.tvDiary.text.trim()
 
             val note = Note(date, text)
-            var expectedOutput1 = """
-                |${note.date}
-                |${note.content}
-                |
-                |$oldText
-        """.trimMargin()
-
-            if (oldText.isBlank()) {
-                expectedOutput1 = """
-                |${note.date}
-                |${note.content}
-        """.trimMargin()
-                Log.d("isBlank", "onCreate: ")
-            }
-
-
-
-            binding.tvDiary.text = expectedOutput1
-            binding.etNewWriting.text.clear()
+            saveNote(note)
+            showNotes()
+            clearInput()
         }
+
     }
 
+    private fun saveNote(note: Note) {
+        notes.add(0,note)
+    }
+
+
+    private fun showNotes() {
+        val notesString = notes.joinToString("\n\n")
+        binding.tvDiary.text = notesString
+    }
+
+    private fun clearInput() {
+        binding.etNewWriting.text.clear()
+    }
 }
