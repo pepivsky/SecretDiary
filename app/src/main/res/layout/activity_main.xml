@@ -26,8 +26,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etNewWriting" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvNotes"
+    <TextView
+        android:id="@+id/tvDiary"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="17dp"

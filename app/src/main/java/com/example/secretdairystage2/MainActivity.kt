@@ -19,7 +19,9 @@ import java.time.LocalDateTime
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
-    lateinit var adapter: RecyclerAdapter
+
+    //lateinit var adapter: RecyclerAdapter
+    val notes = mutableListOf<Note>()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,29 +30,45 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
 
-        val notes = mutableListOf(Note("today", "first"), Note("tomorrow", "second"))
-        binding.rvNotes.layoutManager = LinearLayoutManager(this)
-        adapter = RecyclerAdapter(notes)
-        binding.rvNotes.adapter = adapter
-
         binding.btnSave.setOnClickListener {
             if (binding.etNewWriting.text.isBlank()) {
-                Toast.makeText(applicationContext, "Empty or blank input cannot be saved", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    applicationContext,
+                    "Empty or blank input cannot be saved",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
-
-            val text = binding.etNewWriting.text.toString()
-            //binding.tvDiary.text = text
-            //todo guadar el texto en la lista
 
             val now: Instant = Clock.System.now()
             val localDateTime = LocalDateTime.ofInstant(now.toJavaInstant(), ZoneId.systemDefault())
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            val formatted = localDateTime.format(formatter)
+            val date = localDateTime.format(formatter)
 
-            Log.d("format", formatted)
-            adapter.add(Note(formatted, text))
+            val text = binding.etNewWriting.text.toString()
+            val oldText = binding.tvDiary.text.trim()
+
+            val note = Note(date, text)
+            var expectedOutput1 = """
+                |${note.date}
+                |${note.content}
+                |
+                |$oldText
+        """.trimMargin()
+
+            if (oldText.isBlank()) {
+                expectedOutput1 = """
+                |${note.date}
+                |${note.content}
+        """.trimMargin()
+                Log.d("isBlank", "onCreate: ")
+            }
+
+
+
+            binding.tvDiary.text = expectedOutput1
             binding.etNewWriting.text.clear()
         }
     }
+
 }
