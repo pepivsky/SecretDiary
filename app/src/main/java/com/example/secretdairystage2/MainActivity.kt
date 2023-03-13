@@ -60,12 +60,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveNote(note: Note) {
-        notes.add(0,note)
+        notes.add(note)
     }
 
 
     private fun showNotes() {
-        val notesString = notes.joinToString("\n\n")
+        val notesString = notes.reversed().joinToString("\n\n")
         binding.tvDiary.text = notesString
     }
 
