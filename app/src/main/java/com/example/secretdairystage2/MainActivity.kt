@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.secretdairystage2.databinding.ActivityMainBinding
@@ -18,8 +19,10 @@ import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 
 
+
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
+
     //lateinit var adapter: RecyclerAdapter
     val notes = mutableListOf<Note>()
 
@@ -28,9 +31,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-
-
 
 
         binding.btnSave.setOnClickListener {
@@ -57,6 +57,13 @@ class MainActivity : AppCompatActivity() {
             clearInput()
         }
 
+        binding.btnUndo.setOnClickListener {
+            // todo show dialog
+            showDialog()
+            //undo()
+            //showNotes()
+        }
+
     }
 
     private fun saveNote(note: Note) {
@@ -71,5 +78,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun clearInput() {
         binding.etNewWriting.text.clear()
+    }
+
+    private fun undo() {
+        notes.removeLast()
+    }
+
+    private fun showDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Remove last note")
+            .setMessage("Do you really want to remove the last writing? This operation cannot be undone!")
+            .setPositiveButton("Yes") { _, _ ->
+                //Toast.makeText(this, "Ok", Toast.LENGTH_SHORT).show()
+                if (notes.isEmpty()) {
+                    return@setPositiveButton
+                }
+                undo()
+                showNotes()
+
+            }
+            .setNegativeButton("No", null)
+            .show()
     }
 }
