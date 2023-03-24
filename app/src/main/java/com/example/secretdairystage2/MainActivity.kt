@@ -1,5 +1,7 @@
 package com.example.secretdairystage2
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -19,18 +21,33 @@ import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 
 
+const val PREF_DIARY = "PREF_DIARY"
+const val KEY_DIARY_TEXT = "KEY_DIARY_TEXT"
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
+    private val notes = mutableListOf<Note>()
+    lateinit var sharedPreferences: SharedPreferences
+    lateinit var editor: SharedPreferences.Editor
 
-    //lateinit var adapter: RecyclerAdapter
-    val notes = mutableListOf<Note>()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        sharedPreferences = getSharedPreferences(PREF_DIARY, Context.MODE_PRIVATE)
+        //sharedPreferences = getPreferences(Context.MODE_PRIVATE)
+        editor = sharedPreferences.edit()
+
+
+        val saved = getFromSp()
+        if (saved != "null") {
+            notes.addAll(stringToList(saved))
+            Log.d("oncreate", saved)
+            showNotes()
+        }
 
 
         binding.btnSave.setOnClickListener {
@@ -55,24 +72,25 @@ class MainActivity : AppCompatActivity() {
             saveNote(note)
             showNotes()
             clearInput()
+
+
         }
 
         binding.btnUndo.setOnClickListener {
-            // todo show dialog
             showDialog()
-            //undo()
-            //showNotes()
         }
 
     }
 
     private fun saveNote(note: Note) {
         notes.add(note)
+        saveInSp(listToString(notes))
     }
 
 
     private fun showNotes() {
-        val notesString = notes.reversed().joinToString("\n\n")
+        val notesString = listToString(notes)
+        //println(notesString)
         binding.tvDiary.text = notesString
     }
 
@@ -82,10 +100,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun undo() {
         notes.removeLast()
+        saveInSp(listToString(notes))
     }
 
     private fun showDialog() {
-        AlertDialog.Builder(this)
+        android.app.AlertDialog.Builder(this)
             .setTitle("Remove last note")
             .setMessage("Do you really want to remove the last writing? This operation cannot be undone!")
             .setPositiveButton("Yes") { _, _ ->
@@ -100,4 +119,31 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("No", null)
             .show()
     }
+
+
+    private fun listToString(list: List<Note>): String {
+        return list.reversed().joinToString("\n\n")
+    }
+
+
+    private fun stringToList(notes: String): List<Note> {
+        val strings = notes.split("\n\n")
+        val notesList = mutableListOf<Note>()
+        strings.forEach {
+            val (date, content) = it.split("\n")
+            val note = Note(date, content)
+            notesList.add(note)
+        }
+        return notesList.reversed()
+    }
+
+    private fun saveInSp(toSave: String) {
+        editor.putString(KEY_DIARY_TEXT, toSave).apply()
+    }
+
+    private fun getFromSp(): String {
+        val notes = sharedPreferences.getString(KEY_DIARY_TEXT, "null")
+        return notes!!
+    }
+
 }
